@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Structure Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --secondary: #f72585;
+            --accent: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #38b000;
+            --warning: #ffaa00;
+            --danger: #ef233c;
+            --glass: rgba(255, 255, 255, 0.15);
+            --glass-dark: rgba(0, 0, 0, 0.2);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0c0e2b 0%, #1a1b41 100%);
+            min-height: 100vh;
+            color: var(--light);
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 40px auto;
+            background: var(--glass);
+            border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3), 
+                        inset 0 0 20px rgba(255,255,255,0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            z-index: 0;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header h1 {
+            margin: 0 0 15px 0;
+            font-size: 2.8em;
+            font-weight: 700;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            background: linear-gradient(to right, #fff, #c9d6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.2em;
+            font-weight: 300;
+        }
+        
+        .tier-info {
+            background: var(--glass);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 25px;
+            font-size: 0.95em;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .tier-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .tier-item {
+            background: var(--glass);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: left;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .tier-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .tier-item strong {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 10px;
+        }
+        
+        .tab-btn {
+            background: rgba(67, 97, 238, 0.3);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tab-btn.active {
+            background: var(--primary);
+            box-shadow: 0 0 15px rgba(67, 97, 238, 0.5);
+        }
+        
+        .tab-btn:hover {
+            background: rgba(67, 97, 238, 0.5);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 0 30px 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Calculator Section */
+        .calculator-section {
+            background: rgba(10, 12, 35, 0.6);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .calculator-inputs, .calculator-results {
+            background: rgba(0,0,0,0.2);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .calculator-inputs h3, .calculator-results h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            font-size: 16px;
+            color: white;
+        }
+        
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.3);
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .result-card {
+            background: rgba(67, 97, 238, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 3px solid var(--accent);
+        }
+        
+        .result-card .label {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 5px;
+        }
+        
+        .result-card .value {
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .result-card.highlight {
+            background: rgba(76, 201, 240, 0.3);
+            border-left: 3px solid var(--success);
+        }
+        
+        /* Table Section */
+        .controls {
+            padding: 25px 35px;
+            background: rgba(10, 12, 35, 0.6);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            flex-wrap: wrap;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .control-group label {
+            font-weight: 500;
+            color: var(--light);
+            font-size: 0.95em;
+            min-width: 80px;
+        }
+        
+        .control-group input, .control-group select {
+            padding: 10px 15px;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            color: white;
+            min-width: 180px;
+        }
+        
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.3);
+        }
+        
+        .control-group input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .table-container {
+            padding: 20px 30px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 12px;
+            background: rgba(10, 12, 35, 0.6);
+            border-radius: 15px;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        th {
+            background: linear-gradient(135deg, rgba(33, 37, 41, 0.8), rgba(67, 76, 94, 0.8));
+            color: white;
+            padding: 15px 10px;
+            text-align: center;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        td {
+            padding: 12px 10px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-weight: 500;
+            color: rgba(255,255,255,0.9);
+            transition: all 0.2s ease;
+        }
+        
+        tr:nth-child(even) {
+            background-color: rgba(255,255,255,0.03);
+        }
+        
+        tr:hover td {
+            background: rgba(76, 201, 240, 0.1);
+            color: white;
+        }
+        
+        .highlight {
+            background: rgba(255, 193, 7, 0.2) !important;
+            position: relative;
+        }
+        
+        .highlight::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--warning);
+            box-shadow: 0 0 10px var(--warning);
+        }
+        
+        .stats {
+            padding: 25px 35px;
+            background: rgba(10, 12, 35, 0.6);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.2), rgba(58, 12, 163, 0.2));
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+            z-index: 0;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        
+        .stat-card-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stat-card h3 {
+            margin: 0 0 15px 0;
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .formula-info {
+            padding: 25px 35px;
+            background: rgba(25, 135, 84, 0.15);
+            border-top: 1px solid rgba(40, 167, 69, 0.3);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .formula-info h3 {
+            margin: 0 0 20px 0;
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .formula-info h3::before {
+            content: '📋';
+        }
+        
+        .formula-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .formula-item {
+            background: rgba(25, 135, 84, 0.2);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--success);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .formula-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .formula-item strong {
+            color: #a7e6c4;
+            font-weight: 600;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                border-radius: 20px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .controls {
+                padding: 20px;
+                gap: 15px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .control-group {
+                width: 100%;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+                padding: 20px;
+            }
+            
+            .formula-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Glow effects */
+        .glow {
+            text-shadow: 0 0 10px rgba(76, 201, 240, 0.7);
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: rgba(0,0,0,0.8);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            font-weight: normal;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Toggle switch */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin: 0 10px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(67, 97, 238, 0.3);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1 class="glow">💰 Salary Structure Calculator</h1>
+                <p>Complete salary breakdown from ₹10,000 to ₹1,00,000 CTC</p>
+                <div class="tier-info">
+                    <strong>📊 Salary Tier Structure:</strong>
+                    <div class="tier-grid">
+                        <div class="tier-item">
+                            <strong>Tier 1:</strong> Basic 50%, HRA 50% of Basic, CCA 20% of Basic
+                        </div>
+                        <div class="tier-item">
+                            <strong>Tier 2:</strong> Basic 50%, HRA 40% of Basic, CCA 10% of Basic
+                        </div>
+                        <div class="tier-item">
+                            <strong>Tier 3:</strong> Basic 50%, HRA 35% of Basic, CCA 0% of Basic
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" data-tab="calculator">
+                <i class="fas fa-calculator"></i> Salary Calculator
+            </button>
+            <button class="tab-btn" data-tab="lookup">
+                <i class="fas fa-table"></i> Lookup Table
+            </button>
+        </div>
+        
+        <!-- Calculator Tab -->
+        <div id="calculator" class="tab-content active">
+            <div class="calculator-section">
+                <div class="calculator-grid">
+                    <div class="calculator-inputs">
+                        <h3><i class="fas fa-sliders-h"></i> Input Parameters</h3>
+                        
+                        <div class="input-group">
+                            <label for="calc-ctc">Cost to Company (CTC)</label>
+                            <input type="number" id="calc-ctc" placeholder="Enter CTC" min="10000" max="100000" value="50000">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="calc-gross-input">Gross Salary (Optional)</label>
+                            <input type="number" id="calc-gross-input" placeholder="Enter Gross Salary if known" min="10000" max="100000">
+                            <small style="color: rgba(255,255,255,0.6);">Leave blank to calculate from CTC</small>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="calc-tier">Salary Tier</label>
+                            <select id="calc-tier">
+                                <option value="1" selected>Tier 1 (HRA: 50%, CCA: 20%)</option>
+                                <option value="2">Tier 2 (HRA: 40%, CCA: 10%)</option>
+                                <option value="3">Tier 3 (HRA: 35%, CCA: 0%)</option>
+                            </select>
+                        </div>
+                        
+                        <button class="btn" id="calculate-salary">
+                            <i class="fas fa-calculator"></i> Calculate Salary
+                        </button>
+                    </div>
+                    
+                    <div class="calculator-results">
+                        <h3><i class="fas fa-file-invoice-dollar"></i> Salary Breakdown</h3>
+                        <div class="result-grid">
+                            <div class="result-card">
+                                <div class="label">Basic Salary</div>
+                                <div class="value" id="calc-basic">₹25,000</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="label">HRA</div>
+                                <div class="value" id="calc-hra">₹12,500</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="label">CCA</div>
+                                <div class="value" id="calc-cca">₹5,000</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="label">Special Allowance</div>
+                                <div class="value" id="calc-allowance">₹2,175</div>
+                            </div>
+                            <div class="result-card highlight">
+                                <div class="label">Gross Salary</div>
+                                <div class="value" id="calc-gross">₹27,675</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="label">Total Employer Contribution</div>
+                                <div class="value" id="calc-employer">₹2,253</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="label">Total Employee Deductions</div>
+                                <div class="value" id="calc-deductions">₹2,175</div>
+                            </div>
+                            <div class="result-card highlight">
+                                <div class="label">Net Salary</div>
+                                <div class="value" id="calc-net">₹25,500</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lookup Table Tab -->
+        <div id="lookup" class="tab-content">
+            <div class="controls">
+                <div class="control-group">
+                    <label for="tierSelect">Salary Tier:</label>
+                    <select id="tierSelect" class="tooltip">
+                        <option value="1" selected>Tier 1 (HRA: 50%, CCA: 20%)</option>
+                        <option value="2">Tier 2 (HRA: 40%, CCA: 10%)</option>
+                        <option value="3">Tier 3 (HRA: 35%, CCA: 0%)</option>
+                        <span class="tooltiptext">Select the salary tier structure</span>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="rangeSelect">Salary Range:</label>
+                    <select id="rangeSelect" class="tooltip">
+                        <option value="all">All (10K-100K)</option>
+                        <option value="10-20">10K-20K</option>
+                        <option value="20-50">20K-50K</option>
+                        <option value="50-100">50K-100K</option>
+                        <span class="tooltiptext">Select the CTC range to display</span>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="stepSize">Step Size:</label>
+                    <select id="stepSize" class="tooltip">
+                        <option value="250">₹250</option>
+                        <option value="500">₹500</option>
+                        <option value="1000">₹1,000</option>
+                        <option value="2000">₹2,000</option>
+                        <option value="5000" selected>₹5,000</option>
+                        <option value="10000">₹10,000</option>
+                        <span class="tooltiptext">Select the increment between salary values</span>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="searchCTC">Find CTC:</label>
+                    <input type="number" id="searchCTC" placeholder="Enter CTC" min="10000" max="100000" class="tooltip">
+                    <span class="tooltiptext">Enter a specific CTC to highlight in the table</span>
+                    <button class="btn" onclick="highlightCTC()">
+                        <i class="fas fa-search"></i> Find
+                    </button>
+                </div>
+                <button class="btn" onclick="generateTable()">
+                    <i class="fas fa-sync-alt"></i> Update Table
+                </button>
+            </div>
+            
+            <div class="table-container">
+                <table id="salaryTable">
+                    <thead>
+                        <tr>
+                            <th>CTC</th>
+                            <th>Basic Salary</th>
+                            <th>HRA</th>
+                            <th>CCA</th>
+                            <th>Special Allowance</th>
+                            <th>Gross Salary</th>
+                            <th>Employer ESI</th>
+                            <th>Employer EPF</th>
+                            <th>Employer Medical</th>
+                            <th>Total Employer</th>
+                            <th>Employee PF</th>
+                            <th>Employee ESI</th>
+                            <th>Employee Medical</th>
+                            <th>Total Employee</th>
+                            <th>Net Salary</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salaryTableBody">
+                        <!-- Table will be generated here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="stats" id="stats">
+                <!-- Stats will be generated here -->
+            </div>
+        </div>
+        
+        <div class="formula-info">
+            <h3>Salary Calculation Formulas</h3>
+            <div class="formula-list">
+                <div class="formula-item">
+                    <strong>Basic Salary:</strong> 50% of CTC (All Tiers)
+                </div>
+                <div class="formula-item">
+                    <strong>HRA:</strong><br>
+                    • Tier 1: 50% of Basic (25% of CTC)<br>
+                    • Tier 2: 40% of Basic (20% of CTC)<br>
+                    • Tier 3: 35% of Basic (17.5% of CTC)
+                </div>
+                <div class="formula-item">
+                    <strong>CCA:</strong><br>
+                    • Tier 1: 20% of Basic (10% of CTC)<br>
+                    • Tier 2: 10% of Basic (5% of CTC)<br>
+                    • Tier 3: 0% of Basic (0% of CTC)
+                </div>
+                <div class="formula-item">
+                    <strong>ESI (Employee & Employer):</strong><br>
+                    • If Gross Salary > ₹21,000: ESI = 0<br>
+                    • If Gross Salary ≤ ₹21,000:<br>
+                    &nbsp;&nbsp;- Employer ESI: 3.25% of Gross<br>
+                    &nbsp;&nbsp;- Employee ESI: 0.75% of Gross
+                </div>
+                <div class="formula-item">
+                    <strong>Special Allowance:</strong> Remaining amount to reach target Gross Salary (always ≥ 0)
+                </div>
+                <div class="formula-item">
+                    <strong>Net Salary:</strong> Gross Salary - Total Employee Deductions
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateFromGross(grossSalary, tier = 1) {
+            // Estimate initial CTC
+            let estimatedCTC = Math.round(grossSalary * 1.1);
+            let salary = calculateSalary(estimatedCTC, tier);
+
+            let iterations = 0;
+            const maxIterations = 100;
+            const tolerance = 1;
+
+            while (Math.abs(salary.grossSalary - grossSalary) > tolerance && iterations < maxIterations) {
+                if (salary.grossSalary < grossSalary) {
+                    estimatedCTC += 100;
+                } else {
+                    estimatedCTC -= 100;
+                }
+                salary = calculateSalary(estimatedCTC, tier);
+                iterations++;
+            }
+
+            return salary;
+        }
+        function calculateSalary(ctc, tier = 1) {
+            // Fixed components
+            const basic = Math.round(ctc * 0.5);
+            const empMedical = 375;
+            
+            // Calculate EPF with limit (employer: max ₹1,950, employee: max ₹1,800)
+            const empEPF = basic > 15000 ? 1950 : Math.round(basic * 0.13);
+            const empPF = basic > 15000 ? 1800 : Math.round(basic * 0.12);
+            
+            // Calculate HRA and CCA based on tier
+            let hra, cca;
+            switch(tier) {
+                case 1:
+                    hra = Math.round(basic * 0.5);  // 50% of basic
+                    cca = Math.round(basic * 0.2);  // 20% of basic
+                    break;
+                case 2:
+                    hra = Math.round(basic * 0.4);  // 40% of basic
+                    cca = Math.round(basic * 0.1);  // 10% of basic
+                    break;
+                case 3:
+                    hra = Math.round(basic * 0.35); // 35% of basic
+                    cca = 0;                       // 0% of basic
+                    break;
+                default:
+                    hra = Math.round(basic * 0.5);
+                    cca = Math.round(basic * 0.2);
+            }
+            
+            // Calculate employer ESI (this is part of CTC)
+            // First estimate gross salary without special allowance
+            const baseComponents = basic + hra + cca;
+            let empESI = 0;
+            if (baseComponents <= 21000) {
+                empESI = Math.round(baseComponents * 0.0325);
+            }
+            
+            // Calculate total employer contributions (part of CTC)
+            const totalEmployer = empEPF + empESI + empMedical;
+            
+            // Calculate gross salary target (CTC minus employer contributions)
+            const grossTarget = ctc - totalEmployer;
+            
+            // Calculate special allowance needed to reach gross target
+            let specialAllowance = Math.max(0, grossTarget - baseComponents);
+            specialAllowance = Math.round(specialAllowance);
+            
+            // Final gross salary
+            const grossSalary = baseComponents + specialAllowance;
+            
+            // Recalculate employer ESI with final gross salary
+            if (grossSalary <= 21000) {
+                empESI = Math.round(grossSalary * 0.0325);
+            } else {
+                empESI = 0;
+            }
+            
+            // Recalculate total employer contribution with final ESI
+            const finalTotalEmployer = empEPF + empESI + empMedical;
+            
+            // Calculate employee deductions
+            let empESIDeduction = 0;
+            if (grossSalary <= 21000) {
+                empESIDeduction = Math.round(grossSalary * 0.0075);
+            }
+            const empMedicalDeduction = 375;
+            const totalEmployeeDeduction = empPF + empESIDeduction + empMedicalDeduction;
+            
+            const netSalary = grossSalary - totalEmployeeDeduction;
+            
+            return {
+                ctc,
+                basic,
+                hra,
+                cca,
+                specialAllowance,
+                grossSalary,
+                empESI,
+                empEPF,
+                empMedical,
+                totalEmployer: finalTotalEmployer,
+                empPF,
+                empESIDeduction,
+                empMedicalDeduction,
+                totalEmployeeDeduction,
+                netSalary,
+                tier
+            };
+        }
+
+        // Function to calculate from Gross Salary
+        function calculateFromGross(grossSalary, tier = 1) {
+            // First estimate CTC based on gross salary (this will be adjusted later)
+            let estimatedCTC = Math.round(grossSalary * 1.1); // Initial estimate
+            
+            // Calculate salary structure based on estimated CTC
+            let salary = calculateSalary(estimatedCTC, tier);
+            
+            // Adjust CTC until we get close to the desired gross salary
+            // This is a simple iterative approach
+            let iterations = 0;
+            const maxIterations = 100;
+            const tolerance = 1; // Within 1 rupee
+            
+            while (Math.abs(salary.grossSalary - grossSalary) > tolerance && iterations < maxIterations) {
+                if (salary.grossSalary < grossSalary) {
+                    estimatedCTC += 100; // Increase CTC
+                } else {
+                    estimatedCTC -= 100; // Decrease CTC
+                }
+                
+                salary = calculateSalary(estimatedCTC, tier);
+                iterations++;
+            }
+            
+            return salary;
+        }
+        
+        // Tab switching functionality
+        function setupTabs() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active class from all buttons and contents
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabId = btn.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+        
+        function setupCalculator() {
+            const calculateBtn = document.getElementById('calculate-salary');
+
+            calculateBtn.addEventListener('click', () => {
+                const ctcInput = document.getElementById('calc-ctc').value;
+                const ctc = parseInt(ctcInput);
+                const grossInput = document.getElementById('calc-gross-input').value; // Keep as string initially to check for emptiness
+                const tier = parseInt(document.getElementById('calc-tier').value) || 1;
+
+                if (isNaN(ctc) || ctc < 10000 || ctc > 100000) {
+                    alert('Please enter a CTC between ₹10,000 and ₹1,00,000');
+                    return;
+                }
+
+                let salary;
+
+                // Check if grossInput is provided and is a valid number
+                if (grossInput !== "" && !isNaN(parseInt(grossInput)) && parseInt(grossInput) > 0) {
+                    const targetGross = parseInt(grossInput);
+                    const minGross = Math.round(ctc * 0.2); // This calculation might need re-evaluation based on your specific requirements for min gross
+                    if (targetGross < minGross) {
+                        alert(`Gross Salary must be at least 20% of CTC (₹${minGross.toLocaleString('en-IN')})`);
+                        return;
+                    }
+
+                    salary = calculateWithBoth(ctc, targetGross, tier);
+                } else {
+                    // If grossInput is empty or invalid, calculate solely from CTC
+                    salary = calculateSalary(ctc, tier);
+                }
+
+                document.getElementById('calc-basic').textContent = `₹${salary.basic.toLocaleString('en-IN')}`;
+                document.getElementById('calc-hra').textContent = `₹${salary.hra.toLocaleString('en-IN')}`;
+                document.getElementById('calc-cca').textContent = `₹${salary.cca.toLocaleString('en-IN')}`;
+                document.getElementById('calc-allowance').textContent = `₹${salary.specialAllowance.toLocaleString('en-IN')}`;
+                document.getElementById('calc-gross').textContent = `₹${salary.grossSalary.toLocaleString('en-IN')}`;
+                document.getElementById('calc-employer').textContent = `₹${salary.totalEmployer.toLocaleString('en-IN')}`;
+                document.getElementById('calc-deductions').textContent = `₹${salary.totalEmployeeDeduction.toLocaleString('en-IN')}`;
+                document.getElementById('calc-net').textContent = `₹${salary.netSalary.toLocaleString('en-IN')}`;
+            });
+
+            // Ensure the calculator runs on page load with default values
+            calculateBtn.click();
+        }
+
+        function calculateWithBoth(ctc, targetGross, tier = 1) {
+            // Start by calculating a base salary structure from CTC to get basic, HRA, CCA
+            // We need basic salary to determine PF/EPF limits.
+            let initialSalaryFromCTC = calculateSalary(ctc, tier);
+
+            const basic = initialSalaryFromCTC.basic;
+            const hra = initialSalaryFromCTC.hra;
+            const cca = initialSalaryFromCTC.cca;
+            const empMedical = 375; // Fixed employer medical contribution
+
+            // Calculate Special Allowance based on targetGross
+            const baseComponentsSum = basic + hra + cca;
+            let specialAllowance = Math.max(0, Math.round(targetGross - baseComponentsSum));
+
+            // Ensure the final grossSalary is exactly the targetGross
+            const grossSalary = targetGross;
+
+            // Recalculate EPF/PF based on the basic salary from the CTC calculation
+            // Employer EPF contribution (capped at 1950 if basic > 15000)
+            const empEPF = basic > 15000 ? 1950 : Math.round(basic * 0.13);
+            // Employee PF deduction (capped at 1800 if basic > 15000)
+            const empPF = basic > 15000 ? 1800 : Math.round(basic * 0.12);
+
+            // Recalculate ESI for both employer and employee based on the *targetGross*
+            let empESI = 0;
+            let empESIDeduction = 0;
+
+            if (grossSalary <= 21000) {
+                empESI = Math.round(grossSalary * 0.0325);
+                empESIDeduction = Math.round(grossSalary * 0.0075);
+            }
+
+            // Total Employer Contribution
+            const totalEmployer = empEPF + empESI + empMedical;
+
+            // Employee Medical Deduction (fixed)
+            const empMedicalDeduction = 375;
+
+            // Total Employee Deductions
+            const totalEmployeeDeduction = empPF + empESIDeduction + empMedicalDeduction;
+            
+            // Net Salary based on the targetGross and recalculated deductions
+            const netSalary = grossSalary - totalEmployeeDeduction;
+
+            return {
+                ctc,
+                basic,
+                hra,
+                cca,
+                specialAllowance,
+                grossSalary, // This will be the targetGross
+                empESI,
+                empEPF,
+                empMedical,
+                totalEmployer,
+                empPF,
+                empESIDeduction,
+                empMedicalDeduction,
+                totalEmployeeDeduction,
+                netSalary,
+                tier
+            };
+        }
+        
+        // Table generation
+        function generateTable() {
+            const tierSelect = parseInt(document.getElementById('tierSelect').value);
+            const rangeSelect = document.getElementById('rangeSelect').value;
+            const stepSize = parseInt(document.getElementById('stepSize').value);
+            
+            let startCTC, endCTC;
+            switch(rangeSelect) {
+                case '10-20':
+                    startCTC = 10000;
+                    endCTC = 20000;
+                    break;
+                case '20-50':
+                    startCTC = 20000;
+                    endCTC = 50000;
+                    break;
+                case '50-100':
+                    startCTC = 50000;
+                    endCTC = 100000;
+                    break;
+                default:
+                    startCTC = 10000;
+                    endCTC = 100000;
+            }
+            
+            const tbody = document.getElementById('salaryTableBody');
+            tbody.innerHTML = '';
+            
+            let totalRows = 0;
+            let totalNetSalary = 0;
+            let minNetSalary = Infinity;
+            let maxNetSalary = 0;
+            let zeroESICount = 0;
+            
+            for (let ctc = startCTC; ctc <= endCTC; ctc += stepSize) {
+                const salary = calculateSalary(ctc, tierSelect);
+                
+                const row = document.createElement('tr');
+                
+                // Add visual indicator for zero ESI
+                const esiClass = (salary.empESI === 0 && salary.empESIDeduction === 0) ? 'style="background-color: rgba(25, 135, 84, 0.1);"' : '';
+                
+                row.innerHTML = `
+                    <td>₹${salary.ctc.toLocaleString('en-IN')}</td>
+                    <td>₹${salary.basic.toLocaleString('en-IN')}</td>
+                    <td>₹${salary.hra.toLocaleString('en-IN')}</td>
+                    <td>₹${salary.cca.toLocaleString('en-IN')}</td>
+                    <td>₹${salary.specialAllowance.toLocaleString('en-IN')}</td>
+                    <td><strong>₹${salary.grossSalary.toLocaleString('en-IN')}</strong></td>
+                    <td ${esiClass}>₹${salary.empESI.toLocaleString('en-IN')}</td>
+                    <td>₹${salary.empEPF.toLocaleString('en-IN')}</td>
+                    <td>₹${salary.empMedical.toLocaleString('en-IN')}</td>
+                    <td>₹${salary.totalEmployer.toLocaleString('en-IN')}</td>
+                    <td>₹${salary.empPF.toLocaleString('en-IN')}</td>
+                    <td ${esiClass}>₹${salary.empESIDeduction.toLocaleString('en-IN')}</td>
+                    <td>₹${salary.empMedicalDeduction.toLocaleString('en-IN')}</td>
+                    <td>₹${salary.totalEmployeeDeduction.toLocaleString('en-IN')}</td>
+                    <td><strong>₹${salary.netSalary.toLocaleString('en-IN')}</strong></td>
+                `;
+                row.setAttribute('data-ctc', ctc);
+                tbody.appendChild(row);
+                
+                totalRows++;
+                totalNetSalary += salary.netSalary;
+                minNetSalary = Math.min(minNetSalary, salary.netSalary);
+                maxNetSalary = Math.max(maxNetSalary, salary.netSalary);
+                
+                if (salary.empESI === 0) zeroESICount++;
+            }
+            
+            // Update statistics
+            const avgNetSalary = Math.round(totalNetSalary / totalRows);
+            const tierNames = {1: 'Tier 1', 2: 'Tier 2', 3: 'Tier 3'};
+            const tierColors = {1: '#4361ee', 2: '#f72585', 3: '#4cc9f0'};
+            const statsHTML = `
+                <div class="stat-card" style="background: linear-gradient(135deg, rgba(${hexToRgb(tierColors[tierSelect])}, 0.2), rgba(10, 12, 35, 0.4));">
+                    <div class="stat-card-content">
+                        <h3>Current Tier</h3>
+                        <div class="value">${tierNames[tierSelect]}</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-content">
+                        <h3>Total Rows</h3>
+                        <div class="value">${totalRows}</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-content">
+                        <h3>Zero ESI Count</h3>
+                        <div class="value">${zeroESICount}</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-content">
+                        <h3>Average Net Salary</h3>
+                        <div class="value">₹${avgNetSalary.toLocaleString('en-IN')}</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-content">
+                        <h3>Min Net Salary</h3>
+                        <div class="value">₹${minNetSalary.toLocaleString('en-IN')}</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-content">
+                        <h3>Max Net Salary</h3>
+                        <div class="value">₹${maxNetSalary.toLocaleString('en-IN')}</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('stats').innerHTML = statsHTML;
+        }
+        
+        function hexToRgb(hex) {
+            // Remove # if present
+            hex = hex.replace('#', '');
+            
+            // Parse r, g, b values
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            
+            return `${r}, ${g}, ${b}`;
+        }
+        
+        function highlightCTC() {
+            const searchCTC = parseInt(document.getElementById('searchCTC').value);
+            if (!searchCTC || isNaN(searchCTC)) {
+                alert('Please enter a valid CTC amount');
+                return;
+            }
+            
+            if (searchCTC < 10000 || searchCTC > 100000) {
+                alert('Please enter a CTC between ₹10,000 and ₹1,00,000');
+                return;
+            }
+            
+            // Remove previous highlights
+            document.querySelectorAll('.highlight').forEach(row => {
+                row.classList.remove('highlight');
+            });
+            
+            // Find and highlight the row
+            const targetRow = document.querySelector(`tr[data-ctc="${searchCTC}"]`);
+            if (targetRow) {
+                targetRow.classList.add('highlight');
+                targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Add pulse animation
+                targetRow.style.animation = 'pulse 2s ease-in-out';
+                setTimeout(() => {
+                    targetRow.style.animation = '';
+                }, 2000);
+            } else {
+                alert(`CTC ₹${searchCTC.toLocaleString('en-IN')} not found in current range/step size.`);
+            }
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            setupTabs();
+            setupCalculator();
+            generateTable();
+            
+            // Allow Enter key to search in lookup table
+            document.getElementById('searchCTC').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    highlightCTC();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
